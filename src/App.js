@@ -1,30 +1,49 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={ logo } className="App-logo" alt="logo" />
-        <p>
-          Edit
-          <code>
-            src/App.js
-          </code>
-          and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: ''
+    };
+    this.fetchDogAPI = this.fetchDogAPI.bind(this);
+  }
+  
+  componentDidMount() {
+    this.fetchDogAPI();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if(nextState.data.message.includes('terrier')) return false;
+    return true;
+  }
+
+  componentDidUpdate() {
+    localStorage.setItem('lastURL', this.state.data.message);
+    const breed = this.state.data.message.split('/')[4];
+    alert(breed);
+  }
+
+  fetchDogAPI() {
+    fetch('https://dog.ceo/api/breeds/image/random')
+    .then(response => response.json())
+    .then(result => this.setState({ data: result }));
+  }
+
+
+  render() {
+    const { data } = this.state;
+    if(data === '') return 'loading...';
+    return (
+      <div>
+        <h1>Doge Family</h1>
+        <button onClick={this.fetchDogAPI}>Next Doge xD</button>
+        <div>
+          <img src={data.message} alt='random doge' />
+        </div>
+      </div>
+    );
+  }
 }
 
-export default App;
